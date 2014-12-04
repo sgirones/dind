@@ -85,8 +85,9 @@ rm -rf /var/run/docker.pid
 
 service docker start
 # Wait for docker to start
-RETRIES=5
+RETRIES=10
 while [[ ! -S /var/run/docker.sock && $RETRIES -gt 0 ]]; do sleep 1; RETRIES=$RETRIES-1; done
+[[ ! -S /var/run/docker.sock ]] && echo "Docker failed to start!" && exit 1
 
 if [ "$#" -gt 0 ]
 then
