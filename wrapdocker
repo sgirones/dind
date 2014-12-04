@@ -96,4 +96,8 @@ else
   bash
 fi
 
+RESULT=$?
+
 service docker stop
+
+exit $RESULT
