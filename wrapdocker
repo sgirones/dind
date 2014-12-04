@@ -83,17 +83,16 @@ popd >/dev/null
 # delete it so that docker can start.
 rm -rf /var/run/docker.pid
 
-# If we were given a PORT environment variable, start as a simple daemon;
-# otherwise, spawn a shell as well
-if [ "$PORT" ]
+service docker start
+# Wait for docker to start
+RETRIES=5
+while [[ ! -S /var/run/docker.sock && $RETRIES -gt 0 ]]; do sleep 1; RETRIES=$RETRIES-1; done
+
+if [ "$#" -gt 0 ]
 then
-	exec docker -d -H 0.0.0.0:$PORT $DOCKER_DAEMON_ARGS
+  "$@"
 else
-	if [ "$LOG" == "file" ]
-	then
-		docker -d $DOCKER_DAEMON_ARGS &>/var/log/docker.log &
-	else
-		docker -d $DOCKER_DAEMON_ARGS &
-	fi
-	exec bash
+  bash
 fi
+
+service docker stop
